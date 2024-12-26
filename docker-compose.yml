@@ -1,0 +1,27 @@
+services:
+  postgres:
+    image: bitnami/postgresql:13.3.0-debian-10-r79
+    #    ports:
+    #      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: p@ssw0rd
+  builder:
+    build:
+      context: .
+      dockerfile: docker/builder/Dockerfile
+      args:
+        - BASEIMAGE
+        - GITREV
+        - WALGVERSION
+    environment:
+      - WALGVERSION
+      - WALGURL
+    command:
+      - bash
+      - -c
+      - |
+        cd /host
+        ./scripts/build-rpm.sh
+    working_dir: /host
+    volumes:
+      - ./:/host
