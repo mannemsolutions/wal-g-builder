@@ -1,0 +1,70 @@
+on:
+  workflow_dispatch:
+    inputs:
+      remote:
+        description: Remote to use. This should be a wal-g build repository.
+        required: false
+        default: 'https://github.com/mannemsolutions/wal-g.git'
+      revision:
+        description: Revision to use. This should be a branch, tag or commit on the wal-g repo specified as remote
+        required: true
+        default: 'main'
+
+jobs:
+  build-rpms:
+    name: build for ${{ matrix.distro }} on ${{ matrix.arch }}
+    runs-on: ubuntu-latest
+    env:
+      BASEIMAGE: ${{ matrix.distro }}
+      DOCKERPLATFORM: linux/${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        arch:
+          - arm64
+          - amd64
+        distro:
+          #- rockylinux:8
+          - rockylinux:9
+          #- fedora:39
+          #- fedora:40
+          #- fedora:41
+          #- fedora:42
+    steps:
+      - uses: actions/checkout@master
+      - name: git module stuff
+        run: |
+          #git submodule set-branch --branch ${{ inputs.revision }} wal-g
+          git submodule set-url wal-g ${{ inputs.remote }}
+          git submodule init
+          git submodule update
+          cd wal-g
+          git fetch
+          git checkout ${{ inputs.revision }}
+          git show --stat | head -n5
+      - name: update to docker-compose v2
+        run: |
+          sudo apt-get install -y curl
+          sudo curl -SL https://github.com/docker/compose/releases/download/v2.3.3/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+      - name: compose
+        run: |
+          docker-compose up builder
+          find rpms
+
+##!/bin/bash
+#set -ex
+#git submodule set-url pgbuilder/postgres "${PGBUILDER_REMOTE}"
+#cd postgres
+#git submodule init
+#git submodule update
+#git fetch
+#if ! git checkout "${PGBUILDER_BRANCH}"; then
+#	git checkout "origin/${PGBUILDER_BRANCH}" -b "${PGBUILDER_BRANCH}"
+#else
+#	git checkout "${PGBUILDER_BRANCH}"
+#	git reset --hard "origin/${PGBUILDER_BRANCH}"
+#fi
+#git remote get-url origin
+#git branch
+#git show --stat

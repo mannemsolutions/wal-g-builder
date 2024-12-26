@@ -1,0 +1,4 @@
+[submodule "wal-g"]
+	path = wal-g
+	url = https://github.com/mannemsolutions/wal-g
+	branch = master
