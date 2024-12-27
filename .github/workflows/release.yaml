@@ -4,15 +4,17 @@ on:
     types:
       - published
 
+env:
+  WALGVERSION: ${{ github.ref_name }}
+  WALGURL: https://github.com/mannemsolutions/wal-g.git
+  COMPOSE_DOCKER_CLI_BUILD: 1
+
 jobs:
   build-rpms:
     name: build for ${{ matrix.distro }} on ${{ matrix.arch }}
     runs-on: ubuntu-latest
     env:
       BASEIMAGE: ${{ matrix.distro }}
-      WALGVERSION: ${{ github.ref_name }}
-      WALGURL: https://github.com/mannemsolutions/wal-g.git
-      COMPOSE_DOCKER_CLI_BUILD: 1
     strategy:
       fail-fast: false
       matrix:
@@ -67,9 +69,9 @@ jobs:
 
       - name: git module stuff
         run: |
-          git clone ${WALGURL} wal-g
+          git clone $WALGURL wal-g
           cd wal-g
-          git checkout ${WALGVERSION}
+          git checkout $WALGVERSION
           git show --stat | head -n3
 
       # https://github.com/docker/setup-qemu-action
