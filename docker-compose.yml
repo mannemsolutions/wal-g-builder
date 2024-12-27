@@ -11,6 +11,11 @@ services:
       dockerfile: docker/builder/Dockerfile
       args:
         - BASEIMAGE
+        - GITREV
+        - WALGVERSION
+    environment:
+      - WALGVERSION
+      - WALGURL
     command:
       - bash
       - -c

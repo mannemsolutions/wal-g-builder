@@ -4,7 +4,7 @@ Name: wal-g-pg
 Version: %{_version}
 Release: 1%{?dist}
 License: Apache-2.0
-Group: Unspecified
+Group: Applications/Databases
 Url: %{_url}
 BuildArch: %{_arch}
 Requires: glibc < 2.29

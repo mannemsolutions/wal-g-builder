@@ -17,6 +17,8 @@ jobs:
     env:
       BASEIMAGE: ${{ matrix.distro }}
       DOCKERPLATFORM: linux/${{ matrix.arch }}
+      WALGVERSION: ${{ inputs.revision }}
+      WALGURL: ${{ inputs.remote }}
     strategy:
       fail-fast: false
       matrix:
@@ -34,14 +36,10 @@ jobs:
       - uses: actions/checkout@master
       - name: git module stuff
         run: |
-          #git submodule set-branch --branch ${{ inputs.revision }} wal-g
-          git submodule set-url wal-g ${{ inputs.remote }}
-          git submodule init
-          git submodule update
+          git clone ${{ inputs.remote }} wal-g
           cd wal-g
-          git fetch
           git checkout ${{ inputs.revision }}
-          git show --stat | head -n5
+          git show --stat | head -n3
       - name: update to docker-compose v2
         run: |
           sudo apt-get install -y curl
