@@ -22,7 +22,6 @@ services:
       - |
         cd /host
         ./scripts/build-rpm.sh
-    platform: ${DOCKERPLATFORM}
     working_dir: /host
     volumes:
       - ./:/host
