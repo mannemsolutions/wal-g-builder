@@ -7,7 +7,6 @@ License: Apache-2.0
 Group: Applications/Databases
 Url: %{_url}
 BuildArch: %{_arch}
-Requires: glibc < 2.29
 Requires: libsodium
 Requires: lzo
 Requires: brotli
