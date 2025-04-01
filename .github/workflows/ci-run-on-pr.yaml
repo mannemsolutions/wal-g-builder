@@ -1,15 +1,7 @@
-name: Dispatch build release
+name: CI run on PR
 on:
-  workflow_dispatch:
-    inputs:
-      remote:
-        description: Remote to use. This should be a wal-g build repository.
-        required: false
-        default: 'https://github.com/mannemsolutions/wal-g.git'
-      revision:
-        description: Revision to use. This should be a branch, tag or commit on the wal-g repo specified as remote
-        required: true
-        default: 'main'
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
 
 jobs:
   build-rpms:
@@ -17,8 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       BASEIMAGE: ${{ matrix.distro }}
-      WALGVERSION: ${{ inputs.revision }}
-      WALGURL: ${{ inputs.remote }}
+      WALGVERSION: v3.0.4b
+      WALGURL: https://github.com/mannemsolutions/wal-g.git
       COMPOSE_DOCKER_CLI_BUILD: 1
     strategy:
       fail-fast: false
@@ -41,9 +33,9 @@ jobs:
         uses: docker/setup-buildx-action@v2
       - name: git module stuff
         run: |
-          git clone ${{ inputs.remote }} wal-g
+          git clone ${{ env.WALGURL }} wal-g
           cd wal-g
-          git checkout ${{ inputs.revision }}
+          git checkout ${{ env.WALGVERSION }}
           git show --stat | head -n3
       - name: update to docker-compose v2
         run: |
