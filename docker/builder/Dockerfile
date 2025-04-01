@@ -2,7 +2,8 @@ ARG BASEIMAGE=rockylinux:10
 FROM ${BASEIMAGE} AS build-stage
 ARG GITREV
 ARG WALGVERSION
-RUN grep -qi ID=fedora /etc/os-release || dnf install -y epel-release && \
+RUN echo -e 'fastestmirror=true\nmax_parallel_downloads=20\ninstallonly_limit=10\ndeltarpm=true' >> /etc/dnf/dnf.conf && \
+    grep -qi ID=fedora /etc/os-release || dnf install -y epel-release && \
     dnf install -y golang git cmake rpm-build lzo-devel libsodium-devel
 
 WORKDIR /go/src/app

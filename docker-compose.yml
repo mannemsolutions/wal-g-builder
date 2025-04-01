@@ -29,3 +29,4 @@ services:
     working_dir: /host
     volumes:
       - ./:/host
+      - ./docker/builder/resolv.conf:/etc/resolv.conf
