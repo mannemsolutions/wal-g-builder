@@ -22,6 +22,10 @@ services:
       - |
         cd /host
         ./scripts/build-rpm.sh
+    network_mode: host
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
     working_dir: /host
     volumes:
       - ./:/host
