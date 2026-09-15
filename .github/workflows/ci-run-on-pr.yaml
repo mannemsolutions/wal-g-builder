@@ -3,15 +3,17 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
 
+env:
+  WALGVERSION: v3.0.8b
+  WALGURL: https://github.com/mannemsolutions/wal-g.git
+  COMPOSE_DOCKER_CLI_BUILD: 1
+
 jobs:
   build-rpms:
     name: build for ${{ matrix.distro }} on ${{ matrix.arch }}
     runs-on: ubuntu-latest
     env:
       BASEIMAGE: ${{ matrix.distro }}
-      WALGVERSION: v3.0.4b
-      WALGURL: https://github.com/mannemsolutions/wal-g.git
-      COMPOSE_DOCKER_CLI_BUILD: 1
     strategy:
       fail-fast: false
       matrix:
@@ -49,3 +51,39 @@ jobs:
         env:
           DOCKER_DEFAULT_PLATFORM: linux/${{ matrix.arch }}
           DOCKER_BUILDKIT: 1
+
+  test_image_building:
+    name: Test image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: git module stuff
+        run: |
+          git clone $WALGURL wal-g
+          cd wal-g
+          git checkout $WALGVERSION
+          git show --stat | head -n3
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: |
+            name=ghcr.io/${{ github.repository }},enable=true
+          tags: |
+            type=semver,pattern={{raw}}
+            type=raw,value=latest
+            type=sha
+
+      - name: Build and push operator image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: docker/wal-g-pg/Dockerfile
+          push: false
+          platforms: 'linux/amd64'
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: VERSION=${{ github.ref_name }}
