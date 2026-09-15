@@ -95,9 +95,9 @@ jobs:
         uses: docker/metadata-action@v6
         with:
           images: |
-            name=ghcr.io/${{ github.repository }},enable=true
+            name=ghcr.io/wal-g,enable=true
           tags: |
-            type=semver,pattern={{raw}}
+            type=ref,event=tag
             type=raw,value=latest
             type=sha
 
